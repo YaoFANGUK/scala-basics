@@ -371,7 +371,7 @@ Second: calling factorial
 Last: computing mutiply (n * (...))
 ```
 
-- Stack Recursion uses too much memory, which may leadt to stack overflow.
+- Stack Recursion uses too much memory, which may lead to stack overflow.
 
 <img src="https://s1.ax1x.com/2020/10/09/0D1y9g.png" width="500">
 
