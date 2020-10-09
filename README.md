@@ -89,8 +89,6 @@ val aFloat: Float = 2.0f
 val aDouble: Double = 3.14
 ```
 
-
-
 #### 2.2 Variables
 
 ```scala
@@ -115,7 +113,7 @@ aVariable = 5 // compiler will not complain
 
 `!`
 
-`=`, `+=`, `-=`, ...(Chaning a variable is called a side effect)
+`=`, `+=`, `-=`, ...(Changing a variable is called a side effect)
 
 #### 3.2 Instructions VS Experssions
 
@@ -167,7 +165,7 @@ println(aWeirdValue)
 
 -  The type of  `(aVariable = 3)` is a `Unit` , `Unit` is a special type in Scala is equivalent to void in other languages.  
 
-- **side effects in Scala are actually expressions returning unit**
+- **Side effects in Scala are actually expressions returning `unit`**
 
 e.g. while loops, println(), reassig are side effects that also return a unit
 
@@ -327,8 +325,6 @@ def succ(x: Int) = x +1
 //def succ(x: Int): Int = x +1
 ```
 
-
-
 ### 5.2 What the compiler do NOT know
 
 - Recursion
@@ -349,7 +345,7 @@ This case is an expression which has two branches so the compiler has to analyze
 
 <a href="https://www.youtube.com/watch?v=_JtPhF8MshA&t=523s">Video Explaination</a>
 
-- Stack Recuesion is **Inefficient**
+- Stack Recuesion is **inefficient**
 
 ```scala
 def factorial(n: Int): Int = 
@@ -516,5 +512,113 @@ As we can see the accumulators come from the base case of recursion.
 
 
 
-# 7. Call-By-Name and Call-By-Value
+# 7. Call-By-Value and Call-By-Name
+
+### 7.1 Intro
+
+##### Call-By-Value
+
+```scala
+def calledByValue(x: Long): Unit = {
+  println("by value:" + x)
+  println("by value:" + x)
+}
+```
+
+##### Call-By-Name
+
+- Use `=>` to  tell the compiler that the parameter will be called by name
+
+```scala
+def calledByName(x: => Long): Unit = {
+  println("by name:" + x)
+  println("by name:" + x)
+}
+```
+
+##### Comparision
+
+Tesing:
+
+```scala
+calledByValue(System.nanoTime())
+calledByName(System.nanoTime())
+```
+
+Results:
+
+```shell
+by value:134817818230063
+by value:134817818230063
+by name:134817890556063
+by name:134817890628091
+```
+
+##### Explanation
+
+- In the By Value Call: the exact avlue of this expression is computed before the function evaluates
+- In the By name Call: this expression is passed literally as is. 
+
+```scala
+def calledByValue(x: Long): Unit = {
+  println("by value:" + 134817818230063)
+  println("by value:" + 134817818230063)
+}
+
+
+def calledByName(x: => Long): Unit = {
+  println("by name:" + System.nanoTime())
+  println("by name:" + System.nanoTime())
+}
+```
+
+### 7.2 Examples
+
+```scala
+def infinite(): Int = 1 + infinite()
+def printFirst(x: Int, y: => Int) = println(x)
+```
+
+Case 1:
+
+```scala
+printFirst(infinite(), 34)
+```
+
+Case 2:
+
+```scala
+printFirst(34, infinite())
+```
+
+Case 1 will crash with a stack overflow error, while Case 2 runs well.
+
+##### Explanation
+
+**The by name parameter delays the evaluation of the expression passed here until it's used.** In case 2, since the parameter y is not used, infinite() is never actually evaluated.
+
+### 7.3 Summary
+
+- Call By Value:
+  - Value is computed before call
+  - same value used everywhere
+- Call By Name:
+  - expression is passed literally
+  - expression is evaluated at every use within
+
+
+
+# 8. Default and Named Arguments
+
+```scala
+def facotial(n: Int, acc:Int = 1): Int = {
+  if (n <= 1) acc
+  else facotial(n - 1, n * acc)
+}
+
+// Call
+facotial(10)
+```
+
+In this way, we acutally expose in a function in our API
 
