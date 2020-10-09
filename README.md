@@ -359,7 +359,7 @@ def factorial(n: Int): Int =
 
 Example:
 
-<img src="./images/recur1.jpeg" width="500">
+<img src="https://s1.ax1x.com/2020/10/09/0D1anI.jpg" width="500">
 
 Recursion Order:
 
@@ -373,7 +373,7 @@ Last: computing mutiply (n * (...))
 
 - Stack Recursion uses too much memory, which may leadt to stack overflow.
 
-<img src="./images/recur2.png" width="500">
+<img src="https://s1.ax1x.com/2020/10/09/0D1y9g.png" width="500">
 
 When calculating a larger number, it has to build up a very large intermediate expression, counting down from a million down to one, building up all the multiplications in the middle before we actually get to the end and start collapsing this whole thing down.
 
