@@ -622,3 +622,111 @@ facotial(10)
 
 In this way, we acutally expose in a function in our API
 
+
+
+# 9. Smart Operations on String
+
+```scala
+val str: String = "Hello, I am learning Scala"
+
+str.charAt(2)  //l
+
+str.substring(7,11)   //I am
+
+str.split(" ").toList //List(Hello, I, am, learning, Scala)
+
+str.startWith("Hello") //true
+
+str.replace(" ","-")  //Hello,-I-am-learning-Scala
+
+str.tolowerCase()
+
+str.length
+```
+
+### 9.1 Scala method:
+
+- Prepending
+
+```scala
+val aNumberString = "45"
+println('a' +: aNumberString :+ 'z')
+```
+
+Result:
+
+ ```
+a2z
+ ```
+
+- Reverse
+
+```scala
+str.reverse
+```
+
+- take
+
+```scala
+str.take(2)
+```
+
+### 9.2 Scala Specific: String Interpolators
+
+##### 1. S-interpolators
+
+```scala
+val name = "David"
+val = 21
+val greeting = s"Hello, my name is $name and I am $age eyas old"
+```
+
+- use `$`
+
+##### 2. F-interpolators
+
+```scala
+val speed = 1.2f
+val myth = f"$name can eat $speed$2.2f"
+```
+
+Result:
+
+```
+David can eat 1.20 burgers per minute
+```
+
+<img src="https://s1.ax1x.com/2020/10/09/0DBuGR.png" width="500">
+
+##### 3. Raw-interpolators
+
+```scala
+println(raw"This is a \n newline")
+```
+
+Result:
+
+```
+This is a \n newline
+```
+
+However:
+
+```scala
+val escaped = "This is a \n newlline"
+println(raw"$escaped")
+```
+
+Result:
+
+```
+This is a
+ newline
+```
+
+The raw interpolator of  the strings ignores escaped characters inside raw characters in the string.
+
+
+
+# 10. Object-Oriented Programming in Scala
+
