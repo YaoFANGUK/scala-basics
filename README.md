@@ -1,4 +1,10 @@
-# 1. Getting Started
+[TOC]
+
+# Session 1: Scala Basics
+
+
+
+## 1. Getting Started
 
 ```scala
 package playground
@@ -11,9 +17,9 @@ object ScalaPlayground extends App{
 
 
 
-# 2. Values, Variables & Types
+## 2. Values, Variables & Types
 
-#### 2.1 values 
+### 2.1 values 
 
 ```scala
 object ValuesVariablesTypes extends App {
@@ -89,7 +95,7 @@ val aFloat: Float = 2.0f
 val aDouble: Double = 3.14
 ```
 
-#### 2.2 Variables
+### 2.2 Variables
 
 ```scala
 var aVariable: Int = 4
@@ -101,9 +107,9 @@ aVariable = 5 // compiler will not complain
 
 
 
-# 3. Expressions
+## 3. Expressions
 
-#### 3.1 Operators
+### 3.1 Operators
 
 `+`, `-`, `*`, `/` , `&`, `|` , `<<` , `>>`, 
 
@@ -115,7 +121,7 @@ aVariable = 5 // compiler will not complain
 
 `=`, `+=`, `-=`, ...(Changing a variable is called a side effect)
 
-#### 3.2 Instructions VS Experssions
+### 3.2 Instructions VS Experssions
 
 - Instructions: something that you tell the computer to do.
 
@@ -127,7 +133,7 @@ eg. Chaning a variable, print in the console...
 
 In functional programming, we'll think of expressions that is every single bit of your code will compute a value
 
-##### 3.2.1 If Expression
+#### 3.2.1 If Expression
 
 ```scala
 // if expression
@@ -141,7 +147,7 @@ If expressions always return a result.
 println(if (aCondition) 5 else 3)   // the result is 5
 ```
 
-##### 3.2.2 loops
+#### 3.2.2 loops
 
 - Instructions with side effects
 
@@ -169,7 +175,7 @@ println(aWeirdValue)
 
 e.g. while loops, println(), reassig are side effects that also return a unit
 
-##### 3.2.3 Code Blocks
+#### 3.2.3 Code Blocks
 
 Code blocks are special kind of expressins because they have some special properties.
 
@@ -209,7 +215,7 @@ ANS: 42
 
 
 
-# 4. Functions
+## 4. Functions
 
 ### 4.1 Defining a function
 
@@ -292,7 +298,7 @@ def isPrime(n: Int): Boolean = {
 
 
 
-# 5. Type Inference
+## 5. Type Inference
 
 ### 5.1 What the compiler knows
 
@@ -339,7 +345,7 @@ This case is an expression which has two branches so the compiler has to analyze
 
 
 
-# 6. Recursion
+## 6. Recursion
 
 ### 6.1 Stack Recursion
 
@@ -433,7 +439,7 @@ Last: calling factHelper
 
 The last expression of its code path is the facHelper. This allows Scala to preserve the same stack frame and not use additional stack frames for recursive.  
 
-#### KEY: 
+### 6.3 KEY: 
 
 - **Use recursive call as the LAST expression.**
 - **Use accumulators to turn a function into a tail recursive function**
@@ -441,7 +447,7 @@ The last expression of its code path is the facHelper. This allows Scala to pres
 - Accumulators store intermediate results rather than call the function recursively
 - Once you made a tail recursion, add `@tailrec` before your function declaration, the compiler will check for you if the function respects the conditions for tail recursion, that way you are sure it will optimize the calls as expected.
 
-### 6.3 Exercise
+### 6.4 Exercise
 
 1. Concatenate a string n times, using tail recursion
 
@@ -512,11 +518,11 @@ As we can see the accumulators come from the base case of recursion.
 
 
 
-# 7. Call-By-Value and Call-By-Name
+## 7. Call-By-Value and Call-By-Name
 
 ### 7.1 Intro
 
-##### Call-By-Value
+#### 7.1.1 Call-By-Value
 
 ```scala
 def calledByValue(x: Long): Unit = {
@@ -525,7 +531,7 @@ def calledByValue(x: Long): Unit = {
 }
 ```
 
-##### Call-By-Name
+#### 7.1.2 Call-By-Name
 
 - Use `=>` to  tell the compiler that the parameter will be called by name
 
@@ -608,7 +614,7 @@ Case 1 will crash with a stack overflow error, while Case 2 runs well.
 
 
 
-# 8. Default and Named Arguments
+## 8. Default and Named Arguments
 
 ```scala
 def facotial(n: Int, acc:Int = 1): Int = {
@@ -624,7 +630,7 @@ In this way, we acutally expose in a function in our API
 
 
 
-# 9. Smart Operations on String
+## 9. Smart Operations on String
 
 ```scala
 val str: String = "Hello, I am learning Scala"
@@ -728,7 +734,11 @@ The raw interpolator of  the strings ignores escaped characters inside raw chara
 
 
 
-# 10. Object-Oriented Programming in Scala
+# Session 2: Object-Oriented Programming in Scala
+
+
+
+## 10. Object-Oriented Basics
 
 ### 10.1 Class and Instance
 
@@ -841,7 +851,9 @@ def this(name: String) = this(name, 0)
 def this() = this("John Doe")
 ```
 
-# 11. Exercises for OOP in Scala
+
+
+### 11. Object-Oriented Basics Exercises
 
 ##### 1. Implement a novel and a writer class
 
@@ -906,7 +918,7 @@ class Counter(val count: Int = 0){
 
 
 
-# 12. Syntactic Sugar: Method Notation
+## 12. Syntactic Sugar: Method Notation
 
 ```scala
 object MethodNotations extends App{
@@ -924,7 +936,7 @@ Result:
 true
 ```
 
-#### Syntactic Sugar 1: **infix notation / operator notaion**
+### Syntactic Sugar 1: **infix notation / operator notaion**
 
 Instead of:
 
@@ -970,7 +982,7 @@ println(mary + tom)
 
 - On the other hand: **All operators are methods**
 
-#### Syntactic Sugar 2: prefix notation
+### Syntactic Sugar 2: prefix notation
 
 - Prefix notation is all about unary operators
 
@@ -1010,7 +1022,7 @@ Result:
 Mary, What the heck?!
 ```
 
-#### Syntactic Sugar 3: postfix notation
+### Syntactic Sugar 3: postfix notation
 
 ```scala
 def isAlive: Boolean = true
@@ -1032,7 +1044,7 @@ However, in practice we often use the dot `.` notation, because the space notaio
 
 - **Postfix notaion is only avaiable to method without parameters.**
 
-#### Special Method: `apply`
+### Special Method: `apply`
 
 `apply` has special property in Scala
 
@@ -1058,9 +1070,9 @@ This `apply` breaks that barrier between object oriented programming and functio
 
 
 
-# 13. Excerises for Method Notation
+## 13. Method Notation Excerises
 
-### 1. Overload the `+` operator
+### 13.1 Overload the `+` operator
 
 ```scala
 // receive a string and return a new person with a nickname
@@ -1070,7 +1082,7 @@ def +(nickName: String): Person = new Person(s"$name ($nickName)", favoriteMovie
 println((mary + "the Rockstar").apply())
 ```
 
-### 2. Add an age to the Person class
+### 13.2 Add an age to the Person class
 
 ```scala
 //add a unary + operator => new person with the age + 1
@@ -1082,7 +1094,7 @@ def unary_+ :Person = new Person(name,favoriteMovie,age + 1)
 println((+mary).age)
 ```
 
-### 3. Add a "learns" method in the Person class
+### 13.3 Add a "learns" method in the Person class
 
 ```scala
 // add a learnScala method, calls learns method with "Scala"
@@ -1094,7 +1106,7 @@ def learnsScala: String = this learns "Scala"
 println(mary learnsScala)
 ```
 
-### 4. Overload the apply method
+### 13.4 Overload the apply method
 
 ```scala
 // mary.apply(2) => "Mary watched her favorite movie Inception 2 times"
@@ -1146,7 +1158,9 @@ Mary watched her favorite movie Inception 10 times
 
 <img src="https://s1.ax1x.com/2020/10/11/0cNpX6.png" width="500">
 
-# 14. Scala Objects
+
+
+## 14. Scala Objects
 
 - Objects in Scala are a dedicated (专用的) concept. 
 
@@ -1316,5 +1330,220 @@ Scala application are turned into Java Virtual Machine applications whose entry 
 
 
 
+## 15. Inheritance - Part I
 
+### 15.1 single class inheritance
+
+```scala
+object InheritanceAndTraits extends App{
+  class Animal {
+    def eat = println("nomnom")
+  }
+  
+  class Cat extends Animal
+  
+  val cat = new Cat
+  cat.eat // valid expression
+}
+```
+
+- Scala uses **single class inheritance**, which means to only extend one class at a time. While **Intricate inheritance** models are offered in `traits`
+
+- A subclass only inherits non-private member of the superclass
+
+```scala
+object InheritanceAndTraits extends App{
+  class Animal {
+    private def eat = println("nomnom")
+  }
+  
+  class Cat extends Animal
+  
+  val cat = new Cat
+  cat.eat // invalid expression, eat is inaccessable
+}
+```
+
+- `protected` keyword marks this method/property are only usable within this class and within subclasses only.
+
+```scala
+object InheritanceAndTraits extends App{
+  class Animal {
+    protected def eat = println("nomnom")
+  }
+  
+  class Cat extends Animal{
+    def crunch = {
+      eat  // valid expression (within subclass)
+      println("Crunch Crunch")
+    }
+  }
+  
+  val cat = new Cat
+  cat.eat // invalid expression (without subclass)
+  cat.crunch // valid expression
+}
+```
+
+### 15.2 Constructors
+
+```scala
+class Person(name: String, age: Int)
+class Adult(name: String, age: Int, idCard: String) extends Person // invalid expression, the compiler will complain that we have unspecified value paramters name and age.
+```
+
+Defining class like this with the class signature also defines its constructor. 
+
+When we instantiate a derived class (in this case adult), the JVM will need to call an constructor from a parent class first (in this case person).  
+
+```scala
+class Person(name: String, age: Int)
+class Adult(name: String, age: Int, idCard: String) extends Person(name, age) // this is valid
+```
+
+Or use Auxiliary function as constructor
+
+```scala
+class Person(name: String, age: Int){
+  def this(name: String) = this(name, 0)
+}
+class Adult(name: String, age: Int, idCard: String) extends Person(name) // this is valid
+```
+
+### 15.3 Overriding
+
+```scala
+class Dog extends Animal{
+  override def eat = println("crunch crunch")
+}
+
+val dog = new Dog
+dog.eat
+```
+
+**overriding works for method as well as vals and vars**
+
+```scala
+class Animal {
+  val creatureType = "wild"
+  protected def eat = println("nomnom")
+}
+
+class Dog extends Animal{
+  override val creatureType = "domestic"
+  override def eat = println("crunch crunch")
+}
+val dog = new Dog
+println(dog.creatureType)
+```
+
+Or:
+
+```scala
+class Dog(override val creatureType: String) extends Animal{
+  override def eat = println("crunch crunch")
+}
+
+val dog = new Dog("K9")
+```
+
+Or:
+
+```scala
+class Dog(dogType: String) extends Animal{
+  override val creatureType = dogType
+}
+
+val dog = new Dog("K9")
+```
+
+### 15.4 Type substitution
+
+```scala
+val unknownAnimal: Animal = new Dog("K9")
+unknownAnimal.eat
+```
+
+- **This is a broad sense called polymorphism** (为不同数据类型的实体提供统一的接口)
+- A method call will always go to the most overridden version whenever possible.
+
+- `super` is used when you want to reference a method or a field from parent class.
+
+### 15.5 Preventing overrides
+
+#### 15.5.1 Use keyword `final` on `<method>`
+
+```scala
+class Animal {
+  val creatureType = "wild"
+  final def eat = println("nomnom")
+}
+
+class Dog extends Animal{
+  override def eat = println("crunch crunch")  // invalid expression (Method 'eat' cannot override final member)
+}
+```
+
+This prevernts the method to be overridden.
+
+#### 15.5.2 Use keyword `final` on `<class>`
+
+```scala
+final class Animal {
+  val creatureType = "wild"
+  final def eat = println("nomnom")
+}
+```
+
+This prevents the whole class from being extended.
+
+```scala
+class Animal {
+  val creatureType = "wild"
+  final def eat = println("nomnom")
+}
+
+class Dog extends Animal{ // invalid expression (Illegal inheritance from final class Animal)
+  // ...
+}
+```
+
+### 15.5.3 Seal the class by  `sealed`
+
+- Sealling the class is a software restriction in that you can extend the classes in ths file only, but prevents extension in other files.
+
+In file xx1.scala
+
+```scala
+sealed class Animal {
+  val creatureType = "wild"
+  final def eat = println("nomnom")
+}
+```
+
+In file xx1.scala
+
+```scala
+class Dog extends Animal{   // valid expression
+  //...
+}
+class Cat extends Animal{   // valid expression
+  //...
+}
+```
+
+In file xx2.scala
+
+```scala
+class Dog extends Animal{   // invalid expression
+  //...
+}
+class Cat extends Animal{   // invalid expression
+  //...
+}
+```
+
+
+
+## 16. Inheritance - Part II
 
