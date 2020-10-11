@@ -1148,3 +1148,173 @@ Mary watched her favorite movie Inception 10 times
 
 # 14. Scala Objects
 
+- Objects in Scala are a dedicated (专用的) concept. 
+
+In Java:
+
+```java
+public class JavaPlayground{
+  public static void main(String args[]){
+    // access by
+    System.out.println(Person.N_EYES);
+  }
+}
+
+class Person{
+  public static final int N_EYES = 2;
+}
+```
+
+>  We would access the `N_EYES` field from the class `Person` not from an instance of person. This is called **class level** functionality.
+
+- Scala **DOES NOT** have class-level functionality (e.g., "static")
+
+An object can actually have this knid of static-like functionality.
+
+In Scala:
+
+```scala
+object Object extends App{
+  object Person{    // type + its only instance
+    // "static/"class" level functionality
+    val N_EYES = 2
+  }
+  
+  // access by
+  println(Person.N_EYES)
+}
+```
+
+An object can have `vals` or `vars` and can also have method definitions.
+
+Objects can be defined in a similar way that classes can with the exception that objects do not receive parameters.
+
+We can define the vals and vars and methods **inside objects** and we can access them as we would in a class level setting.
+
+1. In Scala, we use an `object` as a singleton instance.
+
+when we defined the object person, we basically not only define its type but also define its only instance. 
+
+```scala
+val mary = Person 
+val john = Person
+```
+
+ this `Person` is the instance of the person type, which is the only instance that this person type can have. 
+
+```scala
+println(mary == john)
+```
+
+Result:
+
+```
+true
+```
+
+There are singleton instances by definition without any other code needed from us.
+
+2. A pattern used often in practice is that we write objects and classes with the same name
+
+```scala
+class Person(val name: String){
+  // Instance level functionality
+  
+}
+```
+
+This pattern of writing classes and objects with the same name in the same scope is called companions.
+
+3. Factory method
+
+```scala
+object Object extends App{
+  object Person{  
+    
+    // ...
+    //factory method
+    def from(mother: Person, father: Pseron): Person = new Person("Bobbie")
+  }
+}
+```
+
+The sole purpose is to build persons given some parameters.
+
+```scala
+val bobbie = Person.from(mary, john)
+```
+
+Often we rename `from` to `apply`
+
+```scala
+object Object extends App{
+  object Person{  
+    
+    // ...
+    //factory method
+    def apply(mother: Person, father: Pseron): Person = new Person("Bobbie")
+  }
+}
+```
+
+So instead of from, we call apply or delete the apply
+
+```scala
+val bobbie = Person(mary, john)
+// val bobbie = Person.apply(mary, john)
+```
+
+4. Scala Application
+
+- a Scala application is  `a Scala object` wich a very important and particular method called `main`
+
+```scala
+def main(args: Array(String)): Unit
+```
+
+Scala application are turned into Java Virtual Machine applications whose entry point have to be static public static void main with an array of string as a parameter.
+
+**Takeaways**
+
+- Scala doesn't have "static" values/method
+
+- Scala objects
+
+  - are in their own class
+
+  - are the only instance
+
+  - singleton pattern in one line!
+
+    - ```scala
+      object Person{
+        val N_EYES = 2
+        def canFly: Boolean = false
+      }
+      ```
+
+- Scala companions
+
+  - ```scala
+    class Person
+    object Person
+    ```
+
+  - can access each other's private members
+
+  - Scala is more OO than Java
+
+- Scala application
+
+  - ```scala
+    def main(args: Array[String]): Unit
+    ```
+
+  - ```scala
+    object MyApp extends App
+    ```
+
+
+
+
+
