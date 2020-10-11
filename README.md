@@ -1,5 +1,3 @@
-[TOC]
-
 # 1. Getting Started
 
 ```scala
