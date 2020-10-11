@@ -908,3 +908,243 @@ class Counter(val count: Int = 0){
 
 # 12. Syntactic Sugar: Method Notation
 
+```scala
+object MethodNotations extends App{
+  class Person(val name: String, favriteMovie: String) {
+    def likes(movie: String): Boolean = movive == favoriteMoive
+  }
+  val mary = new Person("Mary", "Inception")
+  println(mary.likes("Inception"))
+}
+```
+
+Result:
+
+```
+true
+```
+
+#### Syntactic Sugar 1: **infix notation / operator notaion**
+
+Instead of:
+
+```scala
+println(mary.likes("Inception"))
+```
+
+We can write:
+
+```scala
+println(mary likes "Inception")
+```
+
+**This only works with methods which have only one parameter**.
+
+- Object.methid with a single parameter can be replaced with the repression object method parameter.
+
+The `like` method is like a operator which yields a string, while `mary` and `"inception"` are operands
+
+```scala
+def hangoutWith(person: Person): String = s"$(this.name) is hanging out with $(person.name)" 
+
+val tom = new Person("Tom", "Fight Club")
+println(mary hangoutWith tom)
+```
+
+Result:
+
+```
+Mary is hanging out with Tom
+```
+
+This is also **valid**:
+
+```scala
+def +(person: Person): String = s"$(this.name) is hanging out with $(person.name)" 
+
+val tom = new Person("Tom", "Fight Club")
+println(mary + tom)
+// which equals to println(mary.+(tom))
+
+```
+
+- On the other hand: **All operators are methods**
+
+#### Syntactic Sugar 2: prefix notation
+
+- Prefix notation is all about unary operators
+
+```scala
+val x = -1
+```
+
+this `-` (negative sign ) is a unary operator;
+
+unary operators are also methods.
+
+```scala
+val y = 1.unary_- // equivalent with val y = -1
+```
+
+- `unary_` prefix only works with a few operators:
+  - `-`
+  - `+`
+  - `~`
+  - `!`
+
+Example:
+
+```scala
+def unary_! : String = s"name, What the heck?!"
+```
+
+notice there is a whitespace after the `!`
+
+```scala
+println(!mary) // equivalent with mary.unary_!
+```
+
+Result:
+
+```
+Mary, What the heck?!
+```
+
+#### Syntactic Sugar 3: postfix notation
+
+```scala
+def isAlive: Boolean = true
+```
+
+Instead of:
+
+```scala
+println(mary.isAlive)
+```
+
+We can write:
+
+```scala
+println(mary isAlive)
+```
+
+However, in practice we often use the dot `.` notation, because the space notaion (i.e., the postfix notation) can introduce potential ambiguities when reading the code for human.
+
+- **Postfix notaion is only avaiable to method without parameters.**
+
+#### Special Method: `apply`
+
+`apply` has special property in Scala
+
+```scala
+def apply(): String = s"Hi, my name is $name and I like $favoriteMoive"
+```
+
+The implementation is not significant but the method signature. The method signature is Bloody impory not so much its return type but the **method name** and **method parameters**
+
+Instead of:
+
+```scala
+println(mary.apply())
+```
+
+We can write:
+
+```scala
+println(mary())   // equivalent with println(mary.apply())
+```
+
+This `apply` breaks that barrier between object oriented programming and functional programming.
+
+
+
+# 13. Excerises for Method Notation
+
+### 1. Overload the `+` operator
+
+```scala
+// receive a string and return a new person with a nickname
+// mary + "the rockstart" =>  new person "Mary (the rockstar)"
+def +(nickName: String): Person = new Person(s"$name ($nickName)", favoriteMovie)
+
+println((mary + "the Rockstar").apply())
+```
+
+### 2. Add an age to the Person class
+
+```scala
+//add a unary + operator => new person with the age + 1
+// +mary => mary with the age incremented
+
+def unary_+ :Person = new Person(name,favoriteMovie,age + 1)
+
+// call
+println((+mary).age)
+```
+
+### 3. Add a "learns" method in the Person class
+
+```scala
+// add a learnScala method, calls learns method with "Scala"
+// use it in postfix notation
+def learns(thing: String): String = s"$name leans $thing"
+def learnsScala: String = this learns "Scala"
+
+// call
+println(mary learnsScala)
+```
+
+### 4. Overload the apply method
+
+```scala
+// mary.apply(2) => "Mary watched her favorite movie Inception 2 times"
+def apply(): String = s"Hi, my name is $name and I like $favoriteMovie"
+def apply(n: Int): String = s"$name watched her favorite movie $favoriteMovie $n times"
+
+// call
+println(mary learnsScala)
+println(mary(10))
+```
+
+ANSWER:
+
+```scala
+package playground
+import scala.language.postfixOps
+
+object ScalaPlayground extends App {
+
+  class Person(val name: String, favoriteMovie: String, val age: Int = 0){
+
+    def like(movie: String): Boolean = movie == favoriteMovie
+    def +(nickName: String): Person = new Person(s"$name ($nickName)", favoriteMovie)
+    def unary_+ :Person = new Person(name,favoriteMovie,age + 1)  //prefix notation sugar
+    def learns(thing: String): String = s"$name leans $thing"
+    def learnsScala: String = this learns "Scala" //infix notation sugar
+    def apply(): String = s"Hi, my name is $name and I like $favoriteMovie"
+    def apply(n: Int): String = s"$name watched her favorite movie $favoriteMovie $n times"
+
+  }
+
+  val mary = new Person("Mary", "Inception")
+  println((mary + "the Rockstar").apply())
+  // println((mary + "the Rockstar")())
+  println((+mary).age)
+  println(mary learnsScala) // postfix notation sugar
+  println(mary(10))
+}
+```
+
+Result:
+
+```
+Hi, my name is Mary (the Rockstar) and I like Inception
+1
+Mary leans Scala
+Mary watched her favorite movie Inception 10 times
+```
+
+<img src="https://s1.ax1x.com/2020/10/11/0cNpX6.png" width="500">
+
+# 14. Scala Objects
+
