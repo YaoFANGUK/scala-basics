@@ -730,3 +730,181 @@ The raw interpolator of  the strings ignores escaped characters inside raw chara
 
 # 10. Object-Oriented Programming in Scala
 
+### 10.1 Class and Instance
+
+- A class organises data and behaviour. That is code
+- Instantitaion means concrete realisations and memory that is actual memory spaces that comform to the code and the data structure that the class describes.
+
+```scala
+class Person(name: String, age: Int) // Constructor
+
+object OOBasics extends App{
+  val person = new Person("Join", 26)
+  println()
+}
+```
+
+age is a class parameter but it's not a class member that you can access with.
+
+```scala
+println(person.age) // this is wrong, the compiler will complain
+```
+
+- **Class parameters are NOT FIELDS**
+
+The way to convert a class parameter to a field would be to add the `val` or  `var` keyword
+
+```scala
+class Person(name: String, val age: Int) // Constructor
+```
+
+Now the compiler is happy:
+
+```scala
+println(person.age) // the compiler will NOT complain
+```
+
+To define a class
+
+```scala
+class Person(name: String, val age: Int) {
+  //Body
+  val x = 2   // var definition
+  println(1 + 2)  //expression
+  
+  def greet(name: String): Unit = println(s"$name says: Hi, $name")
+}
+```
+
+The Block of code inside can have basically everything, including:
+
+- `val` and `var` definitions
+- `function` definitions, which is called methods
+- `expressions`
+- other definitions (e.g., packages and other classes)
+
+```scala
+class Person(name: String, val age: Int) {
+  //Body
+  val x = 2   // var definition
+  println(1 + 2)  //expression
+  
+  def greet(name: String): Unit = println(s"$name says: Hi, $name")
+}
+
+val person = new Person("John", 26)
+person.greet("Daniel")
+```
+
+Result:
+
+```
+Daniel says: Hi, Daniel
+```
+
+##### `this` keyword:
+
+```scala
+class Person(name: String, val age: Int) {
+  //Body
+  val x = 2   // var definition
+  println(1 + 2)  //expression
+  
+  def greet(name: String): Unit = println(s"$(this.name) says: Hi, $name")
+}
+
+val person = new Person("John", 26)
+person.greet("Daniel")
+```
+
+the `name` is not a class field but it's still available within the class definition. `this.name` will refer to the name parameter of class `person` whther the `name` is actually a field or not.
+
+Result:
+
+```
+John says: Hi, Daniel
+```
+
+- Overloading: defining method with the same name but different signatures. Different signature means different number of parameters or paramaters of different types coupled with possibly different return type at the end.
+
+### 10.2 Mutilple Constructors 
+
+(or overloading constructors)
+
+In Scala, we use `def this`for building mutiple constructors:
+
+```scala
+def this(name: String) = this(name, 0)
+```
+
+```scala
+def this() = this("John Doe")
+```
+
+# 11. Exercises for OOP in Scala
+
+##### 1. Implement a novel and a writer class
+
+```scala
+/* Novel and Writer
+ * writer: firstname, surname, year
+ *   - method: fullname
+ * novel: name, year of release, author
+ *.  - method: authorAge, isWrittenBy(author), 
+ *             copy(new year of relase) renturn new instance of novel
+ */
+
+class Writer(firstname: String, surname: String, val year:Int) {
+  def fullname(): String = firstname + " " + surname
+}
+
+class Novel(val name: String, yearOfRelase: Int, val author: Writer){
+  // no parameter passed into authorAge, so this is no need to add parentheses
+  def authorAge: Int = yearOfRelase - author.year
+  def isWrittenBy(author: Writer): Boolean = author == this.author
+  def copy(newYear: Int): Novel = new Novel(this.name, newYear, this.author)
+}
+
+val author = new Writer("Chries", "Dickens", 1812)
+val imposter = new Writer("Chries", "Dickens", 1812)
+val novel = new Novel("Great Expectation", 1861, author)
+
+println(novel.authorAge)
+println(novel.isWrittenBy(imposter))
+println(novel)
+println(novel.copy(2008))
+```
+
+##### 2. Implement a counter class
+
+```scala
+/* receives a int value
+* method: - current count
+*         - method to increment/decrement => new counter
+*         - overload inc/dec to receive an amount
+*/
+class Counter(val count: Int = 0){
+  def currentCount = n
+  def increment = new Counter(count + 1)  // immutability
+  def decrement = new Counter(count - 1)  // immutability
+  // Overload
+  // recursively
+  def increment(n : Int): Counter = {
+    if (n <= 0 ) this
+    else increment.increment(n - 1)
+  }
+  // def decrement(n : Int) = new COunter(count - n)
+  // recursively
+  def decrement(n : Int): Counter  = {
+	  if (n <= 0 ) this
+    else decrement.decrement(n - 1)
+  }
+}
+```
+
+<img src="https://s1.ax1x.com/2020/10/11/0cuHc4.png" width="500">
+
+
+
+# 12. Syntactic Sugar: Method Notation
+
