@@ -424,7 +424,7 @@ Deduction:
 = 3628800
 ```
 
-- The tail recursion do not use enormours amount of memory to build up a large  indermediate expression
+- The tail recursion do not use enormours amount of memory to build up a large indermediate expression
 
 Recursion Order:
 
@@ -447,7 +447,21 @@ The last expression of its code path is the facHelper. This allows Scala to pres
 - Accumulators store intermediate results rather than call the function recursively
 - Once you made a tail recursion, add `@tailrec` before your function declaration, the compiler will check for you if the function respects the conditions for tail recursion, that way you are sure it will optimize the calls as expected.
 
-### 6.4 Exercise
+### 6.4 Exapmle
+
+| Stack Recursion                 | Tail Recursion       |
+| :------------------------------ | -------------------- |
+| pow(5, 4)                       | pow(5, 4)            |
+| 5 * pow(5, 3)                   | pow_accum(5, 4, 1)   |
+| 5 * (5 * pow(5, 2))             | pow_accum(5, 3, 5)   |
+| 5 * (5 * (5 * pow(5, 1)))       | pow_accum(5, 2, 25)  |
+| 5 * (5 * (5 * (5 * pow(5, 0)))) | pow_accum(5, 1, 125) |
+| 5 * (5 * (5 * (5 * 1)))         | pow_accum(5, 0, 625) |
+| 625                             | 625                  |
+
+Notice that **the function on the left must store in its stack `exp` number of integers**, which will be multiplied when the recursion terminates and the function returns 1. In contrast, **the function at the right must only store 3 integers at any time**, and computes an intermediary result which is passed to its following invocation. **As no other information outside of the current function invocation must be stored**, a **tail-recursion optimizer can "drop" the prior stack frames**, eliminating the possibility of a stack overflow.
+
+### 6.5 Exercise
 
 1. Concatenate a string n times, using tail recursion
 
@@ -1508,7 +1522,7 @@ class Dog extends Animal{ // invalid expression (Illegal inheritance from final 
 }
 ```
 
-### 15.5.3 Seal the class by  `sealed`
+#### 15.5.3 Seal the class by  `sealed`
 
 - Sealling the class is a software restriction in that you can extend the classes in ths file only, but prevents extension in other files.
 
@@ -1546,4 +1560,115 @@ class Cat extends Animal{   // invalid expression
 
 
 ## 16. Inheritance - Part II
+
+### 16.1 Abstract
+
+```scala
+object AbstractDataTypes extends App{
+  
+  //abstract
+  abstract class Animal {
+    val creatureType: String
+    def eat: Unit
+  
+}
+```
+
+There are situations where you need to leave some fields or methods blank or unimplemented. These are called **abstract** members. Classes which contain unimplemented or abstract fields or methods are called abstract classes and they are defined by the keyword `abstract`.
+
+- Abstract classes can not be instantiated.
+
+```scala
+class Dog extends Animal {
+  override val creatureType: String = "Canine"
+  override def eat: Unit = println("Crunch crunch")
+}
+```
+
+To extend abstract classes, the `override` keyword can be simplified:
+
+```scala
+class Dog extends Animal {
+  val creatureType: String = "Canine"
+  def eat: Unit = println("Crunch crunch")
+}
+```
+
+### 16.2 Traits
+
+#### 16.2.1 Definition
+
+Traits are the ultimate abstract data types in Scala.
+
+```scala
+trait Carnivore{
+  def eat(animal: Animal): Unit
+}
+
+trait ColdBlooded
+```
+
+```scala
+class Crocodile extends Animal with Carnivore with ColdBlooded{
+  val creatureType: String = "Croc"
+  def eat: Unit = println("nomnomnom")
+  def eat(animal: Animal): Unit = println(s"I'm a croc and I'm eating )$(animal.creatureType)"
+}
+
+val dog = new Dog
+val croc = new Crocodile
+croc.eat(dog)
+
+```
+
+Result:
+
+```
+I'm a croc and I'm eating Canine
+```
+
+####  16.2.2 Difference between `trait` and `abstract`
+
+- Similarity:
+
+Both `Abstract`  and `trait` classes can have abstract and non-abstract types
+
+```scala
+abstract class Animal {
+    val creatureType: String = "wild"
+    def eat: Unit
+}
+```
+
+```scala
+trait Carnivore{
+  def eata(animal: Animal): Unit
+  val preferredMeal: String = "fresh meat"
+}
+```
+
+- Difference:
+
+  - **traits** cannot have constructor parameters
+
+  - ```scala
+    trait Carnivore(name: String){      // invalid expression
+      def eata(animal: Animal): Unit
+      val preferredMeal: String = "fresh meat"
+    }
+    ```
+
+  - **multiple traits may be inherited by the same class**: you can only extend one class but you can mix in multiple traits.
+
+  - **trait - behavior**: We choose a **trait** when describe a type of behaviour
+
+  - abstract class is a type of thing: e.g., animal describe animals but traits describe what they do.
+
+### 16.3 Scala's Type Hierarchy
+
+<img src="https://media.geeksforgeeks.org/wp-content/uploads/20190401170602/ScalaTypeHierarchy.png">
+
+
+
+## 17. Inheritance Exercises
 
