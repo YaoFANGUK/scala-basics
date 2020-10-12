@@ -1219,7 +1219,7 @@ Objects can be defined in a similar way that classes can with the exception that
 
 We can define the vals and vars and methods **inside objects** and we can access them as we would in a class level setting.
 
-1. In Scala, we use an `object` as a singleton instance.
+1. **In Scala, we use an `object` as a singleton instance**.
 
 when we defined the object person, we basically not only define its type but also define its only instance. 
 
@@ -1671,4 +1671,165 @@ trait Carnivore{
 
 
 ## 17. Inheritance Exercises
+
+#### Implementing our own collection
+
+```scala
+abstract class MyList{
+  /*
+  head = first element of the list
+  tail = remainder of the list
+  isEmpty = is the list empty
+  add(Int) => new list with this element added
+  toString => a String representation of the list
+  */
+  def head: Int
+  def tail: MyList
+  def isEmpty: Boolean
+  def add(element: Int): MyList
+  def toString: String
+}
+```
+
+Extend by two subclasses: the empty list and non-empty list
+
+- The empty list is an object
+
+```scala
+object Empty extends MyList {
+  def head: Int = ???
+  def tail: MyList = ???
+  def isEmpty: Boolean = ???
+  def add(element: Int): MyList = ???
+}
+```
+
+The `???` returns nothing, when this method is called, it will throw a not implemented error.
+
+- The Non empty list is a class with two parameters
+
+```scala
+class Cons(h: Int, t: MyList) extends MyList {
+  def head: Int = ???
+  def tail: MyList = ???
+  def isEmpty: Boolean = ???
+  def add(element: Int): MyList = ???
+}
+```
+
+`Cons` will actually compose a value with some other list, which is what a linked list actually means. It is composed of an element and the rest of the list.
+
+```scala
+object Empty extends MyList {
+  def head: Int = throw new NoSuchElementException
+  // throw expression are expressions which return nothing (nothing type)
+  def tail: MyList = throw new NoSuchElementException
+  def isEmpty: Boolean = true
+  def add(element: Int): MyList = new Cons(element, Empty)
+}
+```
+
+```scala
+class Cons(h: Int, t: MyList) extends MyList {
+  def head: Int = h
+  def tail: MyList = t
+  def isEmpty: Boolean = false
+  def add(element: Int): MyList = new Cons(element, this)
+}
+```
+
+Test 1:
+
+```scala
+object ListTest extends App{
+  val list = new Cons(1, Empty)
+  println(list.head)
+}
+```
+
+Result:
+
+```
+1
+```
+
+Test 2:
+
+```scala
+object ListTest extends App{
+  val list = new Cons(1, new Cons(2, new Cons(3, Empty)))
+  println(list.tail.head)
+  println(list.add(4).head)
+  println(list.isEmpty)
+}
+```
+
+Result:
+
+```
+2
+4
+false
+```
+
+- To implement `toString` method
+
+```scala
+abstract class MyList{
+  def head: Int
+  def tail: MyList
+  def isEmpty: Boolean
+  def add(element: Int): MyList
+  // Just prints the elements in order with the space in between them
+  def printElements: String 
+  // printElement will actually delegate to the subclasses implementation
+  override def toString: String = "[" + printElements + "]"
+}
+
+object Empty extends MyList {
+  def head: Int = throw new NoSuchElementException
+  def tail: MyList = throw new NoSuchElementException
+  def isEmpty: Boolean = true
+  def add(element: Int): MyList = new Cons(element, Empty)
+  def printElements: String = ""
+}
+
+class Cons(h: Int, t: MyList) extends MyList {
+  def head: Int = h
+  def tail: MyList = t
+  def isEmpty: Boolean = false
+  def add(element: Int): MyList = new Cons(element, this)
+  def printElements: String = 
+  	if (t.isEmpty) "" + h
+  	else h + " " + t.printElements
+  // this is a recursive method which lists every single element in this non empty list by calling printElements recursively on the tail
+}
+
+```
+
+Test:
+
+```scala
+object ListTest extends App{
+  val list = new Cons(1, new Cons(2, new Cons(3, Empty)))
+  // polumorphic call
+  println(list.toString)
+}
+```
+
+Result:
+
+```scala
+[1 2 3]
+```
+
+- Why add `override` before `def toString`?
+
+`toString` and `equals` and `hashCode` are methods that are present in the `anyref` class
+
+<img src="https://s1.ax1x.com/2020/10/12/0WlVPA.md.png" width="500">
+
+
+
+## 18. Generics
 
