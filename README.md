@@ -1812,7 +1812,7 @@ Test:
 ```scala
 object ListTest extends App{
   val list = new Cons(1, new Cons(2, new Cons(3, Empty)))
-  // polumorphic call
+  // polymorphic call
   println(list.toString)
 }
 ```
@@ -1832,4 +1832,167 @@ Result:
 
 
 ## 18. Generics
+
+### 18.1 Generics Implementation
+
+- Single type parameters:
+
+```scala
+object Gnerics extends App{
+  // Generic class
+  class MyList[A] {
+    // use the type A inside the definition
+  }
+  
+  val listOfIntegers = new MyList[Int]
+  val listOfString = new MyList[String]
+}
+```
+
+- Multiple type parameters:
+
+```scala
+class MyMap[key,value] {
+  //
+}
+val mapOfIntString = new MyMap[Int, String]
+```
+
+- This also works for `trait`:
+
+```scala
+trait MyMap[key,value] {
+  //
+}
+val mapOfIntString = new MyMap[Int, String]
+```
+
+-  Generic Methods
+
+```scala
+object MyList {
+  def empty[A]: MyList[A] = ???
+  
+ //...
+  val emptyListOfIntegers = MyList.empty[Int]
+}
+```
+
+### 18.2 Variance Problem
+
+```scala
+class Animal
+class Cat extends Animal
+class Dog extends Animal
+```
+
+If Cat extends Animal, does a list of Cat also extend the list of Animal ?
+
+- Option 1: 
+
+- > Yes, List[Cat] extends List[Animal] = COVARIANCE
+
+  This behaviour is called **covariance** and the way that you declare a covariant list is to:
+
+  ```scala
+  class CovariantList[+A]
+  val animal: Animal = new Cat
+  val animalList: CovariantList[Animal] = new CovariantList[Cat]
+  ```
+
+  `+A` means that this is a covariant list
+
+  - Is animalList.add(new Dog) OK ?
+
+  - > To answer this qustion, we have to lean **bounded type**
+
+    If I add a new Dog into a list of cats, that will turn this new list into a list of animal basically. Because I have cats and a dog which makes the whole list a list of generic animals.
+
+    **Adding a dog to a list of cats would actually turn it into something more generic**
+
+- Option 2:
+
+- > No, List[Animal] and List[Cat] are two separate things
+  >
+  > NO = INVARIANCE
+
+- This is called **invariance** and the way you declare a invariant list is to:
+
+  ```scala
+  class InvariantList[A]
+  val invariantAnimalList: InvariantList[Animal] = new InvariantList[Cat]   // invalid expression
+  ```
+
+- Option 3: (counter-intuitive)
+
+- >  Hell, No!
+
+- This is called **Contravariance**
+
+  ```scala
+  class ContravariantList[-A]
+  val contravariantList: ContravariantList[Cat] = new ContravariantList[Animal]
+  ```
+
+  We can replace a list of animals with a list of cats because cats are animals. In the contravariant case, I'm replacing a list of cats with a list of animals even though cat is a subtype of animal. The relationship is exactly opposite.
+
+  ```scala
+  class Trainer[-A]
+  val contravariantList: Trainer[Cat] = new Trainer[Animal]
+  ```
+
+  Now the semantics of it will change because if I want a trainer of cat but I am supplying a trainer of animal. the trainer of animal on the right hand side is better. Because a trainer of animal can also train a dog or cat, dinosaur...
+
+### 18.3 Bounded types
+
+Bounded types allow you to use your generic classes **only for centain types** that are either a **subclass** of a different type or a **superclass** of a different type.
+
+- `<:`
+
+```scala
+class Cage[A <: Animal](animal: A)
+val cage = new Cage(new Dog))
+```
+
+In this case, class Cage only accepts type parameters which are subtype of animal
+
+```scala
+class Car
+val newCage = new Cage(new Car) // Invalid expression
+```
+
+that is because `Car` does not a class `Animal`
+
+- `>:`
+
+```scala
+class Cage[A >: Animal](animal: A)
+val cage = new Cage(new Dog))
+```
+
+In this case, class Cage only accpet type parameters which are supertypes of animal
+
+- Bounded types solves variance problem
+
+a natural method to add in MyList type would be an add method
+
+```scala
+class MyList[A] {
+  def add(element: A): MyList[A] = ???
+}
+```
+
+this `add` method signature now does not work, even through MyList is covariant and it's generic. The error that the compiler tells us is: 
+
+```
+Covariant type A occurs in contravariant problem in type A of value element
+```
+
+To fix it:
+
+```scala
+def add[B >: A](element: B): MyList[B] = ???
+```
+
+**This means: if I put in a B which is a supertype of A into a list of A, then this list will trun into a MyList of B not into MyList of A.**
 
