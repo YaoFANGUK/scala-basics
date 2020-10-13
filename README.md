@@ -1838,7 +1838,7 @@ Result:
 - Single type parameters:
 
 ```scala
-object Gnerics extends App{
+object Generics extends App{
   // Generic class
   class MyList[A] {
     // use the type A inside the definition
@@ -1945,7 +1945,7 @@ If Cat extends Animal, does a list of Cat also extend the list of Animal ?
 
 ### 18.3 Bounded types
 
-Bounded types allow you to use your generic classes **only for centain types** that are either a **subclass** of a different type or a **superclass** of a different type.
+Bounded types allow you to use your generic classes **only for centain types** that are either a **subclass** `<:`of a different type or a **superclass **`>:` of a different type.
 
 - `<:`
 
@@ -1988,11 +1988,72 @@ this `add` method signature now does not work, even through MyList is covariant 
 Covariant type A occurs in contravariant problem in type A of value element
 ```
 
-To fix it:
+The right way:
 
 ```scala
 def add[B >: A](element: B): MyList[B] = ???
+/*
+ A = Cat
+ B = Animal
+*/
 ```
 
 **This means: if I put in a B which is a supertype of A into a list of A, then this list will trun into a MyList of B not into MyList of A.**
+
+### 18.4 Expand MyList to be Generic
+
+```scala
+abstract class MyList[+A]{
+  def head: A
+  def tail: MyList[A]
+  def isEmpty: Boolean
+  def add[B >: A](element: B): MyList[B]
+  // Just prints the elements in order with the space in between them
+  def printElements: String 
+  // printElement will actually delegate to the subclasses implementation
+  override def toString: String = "[" + printElements + "]"
+}
+
+object Empty extends MyList[Nothing] {
+  def head: Nothing = throw new NoSuchElementException
+  def tail: MyList[Nothing] = throw new NoSuchElementException
+  def isEmpty: Boolean = true
+  def add[B >: Nothing](element: B): MyList[B] = new Cons(element, Empty)
+  def printElements: String = ""
+}
+
+class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+  def head: A = h
+  def tail: MyList[A] = t
+  def isEmpty: Boolean = false
+  def add[B >: A](element: B): MyList[B] = new Cons(element, this)
+  def printElements: String = 
+  	if (t.isEmpty) "" + h
+  	else h + " " + t.printElements
+  // this is a recursive method which lists every single element in this non empty list by calling printElements recursively on the tail
+}
+
+```
+
+```scala
+object ListTest extends App {
+  // val listOfInt: MyList[Int] = Empty
+  // val listOfString: MyList[String] = Empty
+  val listOfInt: MyList[Int] = new Cons(1, new Cons(2, new Cons(3, Empty)))
+  val listOfString: MyList[String] = new Cons("Hello", new Cons("Scala", Empty))
+  println(listOfInt)
+  println(listOfString)
+}
+```
+
+Result:
+
+```
+[1 2 3]
+[Hello Scala]
+```
+
+<img src="https://s1.ax1x.com/2020/10/13/0hNGuj.md.png" width="500">
+
+<img src="https://s1.ax1x.com/2020/10/13/0hN7qA.png" width="500">
 
