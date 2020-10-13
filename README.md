@@ -2057,3 +2057,192 @@ Result:
 
 <img src="https://s1.ax1x.com/2020/10/13/0hN7qA.png" width="500">
 
+
+
+## 19. Anonymous Classes
+
+Example:
+
+```scala
+object AnoymousClasses extends App {
+  abstract class Animal {
+    def eat: Unit
+  }
+  
+  // anonymous class
+  val funnyAnimal: Animal = new Animal {
+    override def eat: Unit = println("ahahahahaha")
+  }
+  
+  prinln(funnyAnimal.getClass)
+}
+```
+
+Result:
+
+```
+class playground.AnoymousClasses$$anon$1
+```
+
+What acutally happen when we wrote this is that the compiler created a class with a name called `playground.AnoymousClassses$$anon$1`
+
+and actually instantiated it later and assigned it to `funnyAnimal`
+
+- Steps of compiler doing this
+
+First:
+
+```scala
+class AnoymousClasses$$anon$1 extends Animal
+```
+
+Second:
+
+```scala
+val funnyAnimal: Animal = new AnoymousClasses$$anon$1
+```
+
+Another example: 
+
+```scala
+class Person(name: String){
+  def sayHi: Unit = println(s"Hi, my name is $name, how can I help?")
+}
+val jim = new Person("Jim"){
+  override def sayHi: Unit = println("Hi, my name is Jim, now can I be of service?")
+}
+```
+
+<img src="https://s1.ax1x.com/2020/10/13/0hwEJP.md.png" width="500">
+
+
+
+## 20. OO Exercise: Expanding Our Collection
+
+1. Generic trait MyPredicate[-T]
+
+It will have a small method to test whether a value of type T passes a condition. It returns a Boolean. Every subclass of MyPredicate[T] will actually have a different implemmentation of that little method.
+
+> Example:
+>
+> ```scala
+> class EvenPredicate extends MyPredicate[Int]
+> ```
+
+```scala
+trait MyPredicate[-T] {
+  def test(elem: T): Boolean
+}
+```
+
+
+
+2. Generic trait MyTransformer[-A, B]
+
+It will take two parameters A and B. It will have a method called `transform(a: A): B` to convert a value of type A into a value of type B. Every subclass of my transformaer will have a different implementation of that method.
+
+> Example:
+>
+> ```scala
+> class StringToIntTransformer extends MyTransformer[String, Int]
+> ```
+
+```scala
+trait MyTransformer[-A, B] {
+  def transform(elem: A): B
+}
+```
+
+
+
+3. MyList functions
+
+- **map**: which takes MyTranformer and returns a new list of a different type
+
+  > Example:
+  >
+  > ```pseudocode
+  > [1,2,3].map(n * 2) = [2, 4, 6]
+  > ```
+
+```Scala
+def map[B](transformer: MyTransformer[A, B]): MyList[B]
+```
+
+- **filter**: which takes MyPredicate and returns MyList
+
+  > Example:
+  >
+  > ```pseudocode
+  > [1,2,3,4].filter(n % 2) = [2, 4]
+  > ```
+
+```scala
+def filter(predicate: MyPredicate[A]): MyList[A]
+```
+
+- **flatMap**: which takes a transformer from  A to MyList[B] and it returns on MyList[B]
+
+  > Example
+  >
+  > ```pseudocode
+  > [1,2,3].flatMap(n => [n,n+1]) => [1,2,2,3,3,4]
+  > ```
+
+```scala
+def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B]
+```
+
+Answer:
+
+```scala
+abstract class MyList[+A] {
+  def head: A
+  def tail: MyList[A]
+  def add[B >: A](element: B): Mylist[B]
+  def printElements: String
+  override def toString: String = "[" + printElements + "]"
+  def map[B](transformer: MyTransformer[A, B]): MyList[B]
+  def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B]
+  def filter(predicate: MyPredicate[A]): MyList[A]
+}
+```
+
+```scala
+object Empty extends MyList[Nothing] {
+  def head: Nothing = throw new NoSuchElementException
+  def tail: MyList[Nothing] = throw new NoSuchElementException
+  def isEmpty: Boolean = true
+  def add[B >: Nothing](element: B): MyList[B] = new Cons(element, Empty)
+  def printElements: String = ""
+  
+  def map[B](transformer: MyTransformer[Nothing, B]): MyList[B] = Empty
+  def flatMap[B](tansformer: MyTransformer[Nothing, MyList[B]]): MyList[B] = Empty
+  def filter(predicate: MyPredicate[Nothing]): MyList[Nothing] = Empty
+}
+```
+
+```scala
+class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+  def head: A = h
+  def tail: MyList[A] = t
+  def isEmpty: Boolean = false
+  def add[B >: A](element: B): MyList[B] = new Cons(element, this)
+  def printElements: String = 
+  	if (t.isEmpty) "" + h
+  	else h + " " + t.printElements
+  
+  def filter(predicate: MyPredicate[A]): MyList[A] = 
+  	if (predicate.test(h)) new Cons(h, t.filer(predicate))
+  	else t.filer(predicate)
+  
+  
+  // 11:21 分 stops here 13th Oct 2020
+  def map[B](transformer: MyTransformer[A, B]): MyList[B]
+  def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B]
+  
+}
+
+
+```
+
