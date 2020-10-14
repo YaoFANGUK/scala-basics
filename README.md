@@ -171,7 +171,7 @@ println(aWeirdValue)
 
 -  The type of  `(aVariable = 3)` is a `Unit` , `Unit` is a special type in Scala is equivalent to void in other languages.  
 
-- **Side effects in Scala are actually expressions returning `unit`**
+-  **Side effects in Scala are actually expressions returning `unit`**
 
 e.g. while loops, println(), reassig are side effects that also return a unit
 
@@ -2117,7 +2117,7 @@ val jim = new Person("Jim"){
 
 
 
-## 20. OO Exercise: Expanding Our Collection
+## 20. OO Exercises: Expanding Our Collection
 
 1. Generic trait MyPredicate[-T]
 
@@ -2135,8 +2135,6 @@ trait MyPredicate[-T] {
 }
 ```
 
-
-
 2. Generic trait MyTransformer[-A, B]
 
 It will take two parameters A and B. It will have a method called `transform(a: A): B` to convert a value of type A into a value of type B. Every subclass of my transformaer will have a different implementation of that method.
@@ -2152,8 +2150,6 @@ trait MyTransformer[-A, B] {
   def transform(elem: A): B
 }
 ```
-
-
 
 3. MyList functions
 
@@ -2193,7 +2189,15 @@ def filter(predicate: MyPredicate[A]): MyList[A]
 def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B]
 ```
 
-Answer:
+> In order to implement flatMap, we need a concatenation function
+
+- ++ (concatenation function)
+
+```scala
+def ++[B :> A](list: MyList[B]): MyList[B]
+```
+
+\[**Answer**\]:
 
 ```scala
 abstract class MyList[+A] {
@@ -2217,8 +2221,9 @@ object Empty extends MyList[Nothing] {
   def printElements: String = ""
   
   def map[B](transformer: MyTransformer[Nothing, B]): MyList[B] = Empty
-  def flatMap[B](tansformer: MyTransformer[Nothing, MyList[B]]): MyList[B] = Empty
   def filter(predicate: MyPredicate[Nothing]): MyList[Nothing] = Empty
+  def ++[B :> Nothing](list: MyList[B]): MyList[B] = list
+  def flatMap[B](tansformer: MyTransformer[Nothing, MyList[B]]): MyList[B] = Empty
 }
 ```
 
@@ -2233,16 +2238,122 @@ class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
   	else h + " " + t.printElements
   
   def filter(predicate: MyPredicate[A]): MyList[A] = 
-  	if (predicate.test(h)) new Cons(h, t.filer(predicate))
-  	else t.filer(predicate)
-  
-  
-  // 11:21 分 stops here 13th Oct 2020
-  def map[B](transformer: MyTransformer[A, B]): MyList[B]
-  def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B]
-  
+  	if (predicate.test(h)) new Cons(h, t.filter(predicate))
+  	else t.filter(predicate)
+  def map[B](transformer: MyTransformer[A, B]): MyList[B] = 
+  	new Cons(transformer.transform(h), t.map(transformer))
+  def ++[B :> A](list: MyList[B]): MyList[B] = new Cons(h, t ++ list)
+  def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B] = transformer.transform(h) ++ t.flatMap(transformer) 
 }
+```
 
+\[**Testing**\]:
+
+```scala
+val listOfIntegers: MyList[Int] = new Cons(1, new Cons(2, new Cons(3, Empty)))
+
+val anotherListOfIntegers: MyList[Int] = new Cons(4, new Cons(5, Empty)))
+```
+
+- map
+
+```scala
+println(listOfIntegers.map(new MyTransformer[Int, Int]{
+  override def transform(elem: Int): Int = elem * 2
+}).toString)
+```
+
+Result:
+
+```shell
+[2 4 6]
+```
+
+Explanation:
+
+```pseudocode
+[1,2,3].map(n * 2)
+= new Cons(2,[2,3].map(n * 2))
+= new Cons(2, new Cons(4, [3].map(n * 2))
+= new Cons(2, new Cons(4, new Cons(6, Empty.map(n * 2))))
+= new Cons(2, new Cons(4, new Cons(6, Empty)))
+```
+
+- filter
+
+```scala
+println(listOfIntegers.filter(new MyPredicate[Int]: Boolean {
+  override def test(elem: Int) = elem % 2 == 0
+})
+```
+
+Result:
+
+```shell
+[2]
+```
+
+Explanation:
+
+```pseudocode
+[1,2,3].filter(n % 2 == 0)
+= [2,3].filter(n % 2 == 0)
+= new Cons(2,[3].filter(n % 2 == 0))
+= new Cons(2,Empty.filter(n % 2 == 0))
+= new Cons(2,Empty)
+```
+
+- ++
+
+```scala
+println(listOfIntegers ++ anotherListOfIntegers).toString)
+```
+
+Result:
+
+```shell
+[1,2,3,4,5]
+```
+
+Explanation:
+
+```pseudocode
+[1,2,3] ++ [4,5]
+= new Cons(1, [2,3] ++ [4,5])
+= new Cons(1, new Cons(2, [3] ++ [4,5])))
+= new Cons(1, new Cons(2, new Cons(3, Empty ++ [4,5])))
+= new Cons(1, new Cons(2, new Cons(3, [4,5]))
+= new Cons(1, new Cons(2, new Cons(3, new Cons(4, new Cons(5, Empty)))))
+```
+
+- flatMap
+
+```scala
+println(listOfIntegers.flatMap(new MyTransformer[Int, MyList[Int]] {
+  override def transform(elem: Int): MyList[Int] = new Cons( elem, Cons[elmen + 1, Empty])
+}).toString)
+```
+
+Result:
 
 ```
+[1 2 2 3 3 4]
+```
+
+Explanation:
+
+```pseudocode
+[1,2].flatMap(n => [n,n + 1])
+= transformer.transform(1) ++ [2].flatMap(n => [n,n + 1])
+// transformer: n => [n, n + 1]
+// 1 => [1,2]
+= [1, 2] ++ [2].flatMap(n => [n,n + 1])
+= [1,2] ++ [2,3] ++ Empty.flatMap(n => [n,n + 1])
+= [1,2] ++ [2,3] ++ Empty
+= [1,2,2,3]
+```
+
+
+
+## 21. Case Classes
 
