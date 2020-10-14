@@ -2357,3 +2357,206 @@ Explanation:
 
 ## 21. Case Classes
 
+### 21.1 Case Classes
+
+There is a problem that for lightweight data structure (like class person), we need to reimplement all sorts of boilerplate like `companion objects`, `standard methods ` for serialising and for `toString`, `equals`, `hasCode`
+
+Case classes are an ideal solution to this problem. 
+
+```scala
+case class Person(name: String, age: Int)
+```
+
+The `case` keyword does the following things:
+
+1. **class parameters are promoted to fields**
+
+默认为主构造函数参数列表的所有参数前加 val
+
+```scala
+case class Person(name: String, age: Int)
+val jim = new Person("Jim", 34)
+println(jim.name)  //valid expression
+```
+
+>  Instead:
+>
+> ```scala
+> class Person(name: String, age: Int)
+> val jim = new Person("Jim", 34)
+> println(jim.name)  //invalid expression
+> ```
+
+2. **sensible toString**
+
+```scala
+case class Person(name: String, age: Int)
+val jim = new Person("Jim", 34)
+println(jim.toString)
+```
+
+Result:
+
+```
+Person(Jim,34)
+```
+
+> Instead:
+>
+> ```scala
+> class Person(name: String, age: Int)
+> val jim = new Person("Jim", 34)
+> println(jim.toString)
+> ```
+>
+> Result:
+>
+> ```
+> ScalaPlayground.Person@7b69c6ba
+> ```
+
+- Syntactic Sugar:  
+
+```
+println(jim.toString) 
+// equals to
+println(jim)
+```
+
+println(instance) = println(instance.toString)
+
+3. **`equals` and `hashCode` implemented out of the box**
+
+添加天然的 hashCode、equals 和 toString 方法。由于 == 在 Scala 中总是代表 equals，所以 case class 实例总是可比较的
+
+```scala
+val jim2 = new Person("Jim", 34)
+prinln(jim == jim2)
+```
+
+Result:
+
+```
+true
+```
+
+4. **Case classes have handy copy methods**
+
+生成一个 `copy` 方法以支持从实例 a 生成另一个实例 b，实例 b 可以指定构造函数参数与 a 一致或不一致
+
+```scala
+val jim3 = jim.copy(age = 45)
+println(jim3)
+```
+
+Result:
+
+```
+Person(Jim, 45)
+```
+
+5. **Case classes have companion objects**
+
+创建 case class 和它的伴生 object
+
+```scala
+val thePerson = Person
+```
+
+It delegates to the Person's `apply` method. The companion object's apply method does the same thing  as the constructor. So in practice, we don't need to use the keywork new when instantiating a case class
+
+实现了 apply 方法让你不需要通过 new 来创建类实例
+
+```scala
+val mary = Person("Mary", 23)
+```
+
+6. **Case classes are serialisable**
+
+It makes classes especially useful when dealing with distributed systems. We can send instances of case classes through the network and in between JVM.
+
+7. **Case classes have extractor patters**
+
+This means case classes can be used in pattern matching
+
+### 21. 2 Case Objects
+
+```scala
+case object UnitedKindom {
+  def name: String = "The UK of GB and NI"
+}
+```
+
+Case objects have the same property as case classes except they don't get companion objects because they are their own companion objects.
+
+### 21.3 Exercise
+
+Expand MyList using case classes and case objects
+
+```scala
+abstract class MyList[+A] {
+  def head: A
+  def tail: MyList[A]
+  def add[B >: A](element: B): Mylist[B]
+  def printElements: String
+  override def toString: String = "[" + printElements + "]"
+  def map[B](transformer: MyTransformer[A, B]): MyList[B]
+  def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B]
+  def filter(predicate: MyPredicate[A]): MyList[A]
+}
+
+case object Empty extends MyList[Nothing] {
+  def head: Nothing = throw new NoSuchElementException
+  def tail: MyList[Nothing] = throw new NoSuchElementException
+  def isEmpty: Boolean = true
+  def add[B >: Nothing](element: B): MyList[B] = new Cons(element, Empty)
+  def printElements: String = ""
+  
+  def map[B](transformer: MyTransformer[Nothing, B]): MyList[B] = Empty
+  def filter(predicate: MyPredicate[Nothing]): MyList[Nothing] = Empty
+  def ++[B :> Nothing](list: MyList[B]): MyList[B] = list
+  def flatMap[B](tansformer: MyTransformer[Nothing, MyList[B]]): MyList[B] = Empty
+}
+
+case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+  def head: A = h
+  def tail: MyList[A] = t
+  def isEmpty: Boolean = false
+  def add[B >: A](element: B): MyList[B] = new Cons(element, this)
+  def printElements: String = 
+  	if (t.isEmpty) "" + h
+  	else h + " " + t.printElements
+  
+  def filter(predicate: MyPredicate[A]): MyList[A] = 
+  	if (predicate.test(h)) new Cons(h, t.filter(predicate))
+  	else t.filter(predicate)
+  def map[B](transformer: MyTransformer[A, B]): MyList[B] = 
+  	new Cons(transformer.transform(h), t.map(transformer))
+  def ++[B :> A](list: MyList[B]): MyList[B] = new Cons(h, t ++ list)
+  def flatMap[B](tansformer: MyTransformer[A, MyList[B]]): MyList[B] = transformer.transform(h) ++ t.flatMap(transformer) 
+}
+```
+
+Testing:
+
+```scala
+val listOfIntegers: MyList[Int] = new Cons(1, new Cons(2, new Cons(3, Empty)))
+val cloneListOfIntegers: MyList[Int] = new Cons(1, new Cons(2, new Cons(3, Empty)))
+```
+
+```scala
+println(cloneListOfIntegers == listOfIntegers)
+```
+
+Result:
+
+```
+true
+```
+
+<img src="https://s1.ax1x.com/2020/10/14/05VKa9.png" width="500">
+
+
+
+## 22. Exceptions
+
