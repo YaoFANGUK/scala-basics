@@ -2779,3 +2779,154 @@ object PocketCalculator {
 
 ## 23. Packaging and Imports
 
+### 23.1 what is a package
+
+- A package is basically just a bunch of definitions grouped under the same name. In 99% of the time, this matches directory structure.
+
+- Members within a package are visible/accessible by using their symbol name.
+
+For example, the project structure is as follows:
+
+```scala
+.
+├── rock-the-jvm-scala-beginners.iml
+├── scala-beginners.iml
+└── src
+    ├── lectures
+    │   └── part2oop
+    │       └──CaseClasses.scala
+    └── playground
+        └── ScalaPlayground.scala
+
+```
+
+In `CaseClasses.scala`
+
+```scala
+package lectures.part2oop
+//...
+object CaseClasses extends App {
+  // ...
+  case object UnitedKingdom {
+    def name: String = "The UK of GB and NI"
+  }
+}
+```
+
+In `ScalaPlayground.scala`
+
+```scala
+package playground
+import lectures.part2oop.CaseClasses.UnitedKingdom
+
+val country = UnitedKingdom
+```
+
+We have to `import` a package that we want to use
+
+If we don't want  `import`, we have to use `fully qualified name`
+
+- Fully Quanlified name:
+
+```scala
+package playground
+
+val country = lectures.part2oop.CaseClasses.UnitedKingdom
+```
+
+- Packages are ordered hierarchically
+
+The hierarchy is given by this dot `.` notation .
+
+E.g. The `part2oop` package is a sub-package of `lectures` package
+
+### 23.2 Package Object
+
+We can now only write classes and traits and objects and we can only access values or methods or constants from them. Nut we might need to have some kind of universal constants or universal methods that reside outside classes/traits/.. so we don't need to resort to classes to access them. Package Objects are created for this purpose.
+
+```scala
+package lectures
+
+
+package object part2oop {
+  def sayHello: Unit = println("Hello, Scala")
+  val SPEED_OF_LIGHT = 299792458
+}
+```
+
+- **Package objects can only be one per package**
+
+- The naming convention of package objects file is `package.scala`
+
+Inside this package object, we can define method or constants and use them by their name throughout the entire rest of the package.
+
+In `CaseClasses.scala`
+
+```scala
+sayHello
+val speed = SPEED_OF_LIGHT
+```
+
+### 23.3 Import Package
+
+1. Import two or more package
+
+```scala
+import playground.{PrinceCharming, Cinderella}
+```
+
+2. Import all sub-package
+
+```scala
+import playground._
+```
+
+Only use underscore`_` if you actually need it.
+
+3. Name aliasing at imports
+
+```scala
+import playground.{PrinceCharming, Cinderella => Princess}
+
+val princess = new Princess
+```
+
+This feature is useful if for some reason you need to import more than one class with the same name from different packages. This aliasing will solve naming conflicts. 
+
+```scala
+import java.util.Date
+import java.sql.Date
+val d = new Date // compiler will assume this is the first import
+```
+
+To fix it:
+
+- use full qualified name
+
+```scala
+val date = new Date
+val sqlDate = new java.sql.Date(2018,5,4) 
+```
+
+- use aliasing
+
+```scala
+import java.util.Date
+import java.sql.[Date => SqlDate]
+
+val date = new Date
+val sqlDate = new sqlDate(2018,5,4) 
+```
+
+4. Default imports
+
+Default imports are packages that are automatically imported without any intentional import from your side. 
+
+Some examples includes:
+
+- `java.lang`: String, Object, Exception etc.
+- `scala`: Int, Nothing, Function etc.
+- `scala.Predef`: println, ??? etc.
+
+
+
