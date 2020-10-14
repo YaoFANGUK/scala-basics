@@ -950,7 +950,7 @@ Result:
 true
 ```
 
-### Syntactic Sugar 1: **infix notation / operator notaion**
+### Syntactic Sugar 1: infix notation / operator notaion
 
 Instead of:
 
@@ -2559,4 +2559,223 @@ true
 
 
 ## 22. Exceptions
+
+Example:
+
+```scala
+val x:String = null
+println(x.length)
+// this will crash with a NullPointerException
+```
+
+### 22.1 Throw an Exception
+
+- Use `throw` keyword
+
+```scala
+throw new NullPointerException
+```
+
+It returns a `Nothing`
+
+```scala
+val aWeirdValue = throw new NullPointerException
+```
+
+```scala
+val aWeirdValue: String = throw new NullPointerException
+// also valid because Nothing is a valid substitute for any other type.
+```
+
+### 22.2 `throwable` class
+
+- throwable classes extend the Throwable class
+
+- `Exception` and `Error` are the major Throwable subtypes
+
+> Both exceptions and errors will crash JVM, but exceptions and errors are different in their semantics
+>
+> - `Exceptions` denote something that went wrong with the program. (e.g., null pointer exception)
+> - `Errors` denote something that happened wrong with the system. (e.g., Stack overflow error)
+
+### 22.3 Catch an Exception
+
+```scala
+def getInt(withExceptions: Boolean):Int = 
+	if (withExceptions) throw new RuntimeException("No Int for you")
+	else 42
+
+try {
+  // code that might throw
+  getInt(true)
+} 
+catch {
+	case e: RuntimeException => println("caught a Runtime exception")  
+}
+finally {
+  // code that will get executed no matter what
+  println("Finally")
+}
+```
+
+`getInt` with the parameter `true` tries to throw a runtime exception, and it got caught in the `catch` block. The case `e` runtime exception is a pattern for the exception that got thrown. The `=> println("caught a Runtime exception")  ` expression got evaluated which had the side effect of printing to the console
+
+```scala
+def getInt(withExceptions: Boolean):Int = 
+	if (withExceptions) throw new RuntimeException("No Int for you")
+	else 42
+```
+
+```scala
+try {
+  // code that might throw
+  getInt(true)
+} 
+catch {
+	case e: NullPointerException => println("caught a Runtime exception")  
+}
+finally {
+  // code that will get executed no matter what
+  println("Finally")
+}
+```
+
+Now `e` catches Null pointerException, and this programming will crash.
+
+- `finally ` block is optioanl and also **`finally` does not influence the return type of the `try/catch`expression**
+
+```scala
+val potentialFail = try {
+  getInt(true)
+} 
+catch {
+	case e: RuntimeException => 43
+}
+finally {
+  println("Finally")
+}
+
+println(potentialFail)
+```
+
+Result:
+
+```shell
+43
+```
+
+The `try` returns an `Int` and `catch` also returns an `Int`, so the type of `potentialFail` is `Int`
+
+```scala
+val potentialFail = try {
+  getInt(true)
+} 
+catch {
+	case e: RuntimeException => println("caught a Runtime exception")
+}
+finally {
+  println("Finally")
+}
+
+println(potentialFail)
+```
+
+Result:
+
+```shell
+caught a Runtime exception
+Finally
+()
+```
+
+The `try` returns a `Int` and `catch` returns an `unit`, so the compiler tries to unify `int` and `unit`. Thus, the type of `potentialFail` is `AnyVal`
+
+- Use `finally` only for side effects
+
+  > E.g. loging sth. to a file
+
+### 22.4 Define Our Own Exceptions
+
+Exceptions are instances of special classes that derive from `Exception` or `Error`
+
+```scala
+class MyException extends Exception
+val exception = new MyException
+
+throw exception
+```
+
+1. Crash your program with an OutOfMemoryError (OOM)
+
+```scala
+val array = Array.ofDim(Int.MaxValue)
+```
+
+2. Crash with StackOverflowError (SO)
+
+```scala
+def infinite: Int = 1 + infinite
+```
+
+3. PocketCalculator
+
+- add(x,y)
+
+- subtract(x,y)
+
+- multiply(x,y)
+
+- devide(x,y)
+
+  >  Throw:
+  >
+  > - OverflowException if add(x,y) exceeds Int.MAX_VALUE
+  > - UnderflowException if subtract(x,y) exceeds Int.MIN_VALUE
+  > - MathCalculationException for division by 0
+
+```scala
+class OverflowException extends RuntimeException
+class UnderflowException extends RuntimeException
+class MathCalculationException extends RuntimeException("Division by 0")
+
+object PocketCalculator {
+  def add(x: Int, y: Int) {
+    val result = x + y
+    // a positive value puls a positive value giving a negative value means that overflown integer
+    if (x > 0 && y > 0 && result < 0) throw new OverflowException
+    else if (x < 0 && y < 0 && result > 0) throw new UnferflowException
+    else result
+  }
+  
+  def subtract(x: Int, y: Int) = {
+    val result = x - y
+    if (x > 0 && y < 0 && result < 0) throw new OverflowException
+    else if (x < 0 && y > 0 && result > 0) throw new UnferflowException
+    else result
+  }
+  
+  def multiply(x: Int, y: Int) = {
+    val result = x - y
+    if (x > 0 && y > 0 && result < 0)throw new OverflowException
+    else if (x < 0 && y < 0 && result > 0)throw new OverflowException
+    else if (x > 0 && y < 0 && result > 0)throw new underflowException 
+    else if (x < 0 && y > 0 && result > 0)throw new underflowException
+    else result
+  }
+  
+  def divide(x: Int, y: Int) = {
+    if (y == 0) throw new MathCalculationException
+    else x / y
+  }
+  
+  println(PocketCalculator.add(Int.MaxValue, 10))
+  println(PocketCalculator.divide(2, 0))
+}
+```
+
+<img src="https://s1.ax1x.com/2020/10/14/05RHdx.png" width="500">
+
+
+
+## 23. Packaging and Imports
 
