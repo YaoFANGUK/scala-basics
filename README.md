@@ -2330,7 +2330,7 @@ Explanation:
 
 ```scala
 println(listOfIntegers.flatMap(new MyTransformer[Int, MyList[Int]] {
-  override def transform(elem: Int): MyList[Int] = new Cons( elem, Cons[elmen + 1, Empty])
+  override def transform(elem: Int): MyList[Int] = new Cons(elem, Cons(elmen + 1, Empty))
 }).toString)
 ```
 
@@ -3112,4 +3112,142 @@ Result:
 
 
 ## 25. Anonymous Functions
+
+### 25.1 Lambda
+
+#### 25.1.1 Intro
+
+Object Oriented way of defining an anonymous function and instantiating it on the spot:
+
+```scala
+val doubler = new Function1[Int, Int] {
+  override def apply(x: Int) = x * 2
+}
+```
+
+In Scala, we can simply write this way:
+
+```scala
+val doubler = (x: Int) => x * 2
+```
+
+Its called **anonymous function** or **a lambda**. The name lambda comes from the term lambda calculus, which is the mathematical representation of functional programming.
+
+the lambda thing `(x: Int) => x * 2` is a value which is an instance of Funtion1
+
+- Single Parameter
+
+```scala
+// we can also define this way 
+val doubler: Int => Int = x => x * 2
+```
+
+- Multiple Parameter
+
+```scala
+val adder: (Int, Int) => Int = (a: Int, b: Int) => a + b
+```
+
+- No Paramter
+
+```scala
+val justDoSomething: ()=> Int = () => 3
+```
+
+```scala
+// carefull
+println(justDoSomething)  //function itself
+println(justDoSomething()) // actual call
+```
+
+Result:
+
+```
+playground.ScalaPlayground$$$Lambda$17/0x00000008000c0c40@76a3e297
+3
+```
+
+**In OOP, we can call no-paramter methods without `()`, but when it comes to lambdas, we must  call them with `()`**
+
+#### 25.1.2 Curly brace with lambda
+
+```scala
+val stringToInt = {
+  (str: String) => Str.toInt
+}
+```
+
+### 25.2 Syntactic Sugar
+
+#### 25.2.1 `=>` 
+
+As the most simplified answer, you can substitute whatever is on the left-hand side of `=>` with the word "LEFT" and whatever is on the right-hand side with the word "RIGHT".
+
+Then, the meaning of "**LEFT => RIGHT**" becomes:
+
+**Take LEFT then do RIGHT.**
+
+This means that if you have a "()=>" that you can take nothing (that is, no parameters) and then do whatever is on the right-hand side.
+
+#### 25.2.2 `_` 
+
+**`_` underscore stands for a different parameter.**
+
+- Increment
+
+```scala
+val niceIncrement: Int => Int = _ + 1 // equivalent to x => x + 1 
+```
+
+- Add
+
+```scala
+val niceAdder:(Int, Int) => Int = _ + _ // equivalent to (a,b) => a + b 
+```
+
+### 25.3 Exercises
+
+1. MyList: replace all FunctionX calls with lambdas
+
+   > ```scala
+   > println(listOfIntegers.map(new MyTransformer[Int, Int]{
+   >   override def transform(elem: Int): Int = elem * 2
+   > }).toString)
+   > 
+   > println(listOfIntegers.filter(new MyPredicate[Int]: Boolean {
+   >   override def test(elem: Int) = elem % 2 == 0
+   > })
+   >         
+   > println(listOfIntegers.flatMap(new MyTransformer[Int, MyList[Int]] {
+   >   override def transform(elem: Int): MyList[Int] = new Cons(elem, Cons[elmen + 1, Empty])
+   > }).toString)
+   > ```
+
+```scala
+println(listOfIntegers.map(elem => elem * 2).toString)
+// println(listOfIntegers.map(_ * 2).toString)
+println(listOfIntegers.filter(elem => elem % 2 == 0)
+// println(listOfIntegers.filter(_ % 2 == 0)
+println(listOfIntegers.flatMap(elem: Int => new Cons(elem, Cons(elmen + 1, Empty))).toString)
+```
+
+2. Rewrite the "special" adder as an anonymous function
+
+   > ```scala
+   > val superAdder: Function1[Int, Function1[Int, Int]] = new Function1[Int, Function1[Int, Int]] {
+   >   override def apply(x: Int): Function1[Int, Int] = new Function1[Int, Int] {
+   >     override def apply(y: Int): Int = x + y
+   >   }
+   > }
+   > ```
+
+```scala
+val superAdder = (x: Int) => (y: Int) => x + y
+```
+
+<img src="https://s1.ax1x.com/2020/10/15/07epcR.png" width="500">
+
+
+
+## 26. Higer-Order-Functions and Curries
 
