@@ -1,6 +1,6 @@
 [TOC]
 
-# Session 1: Scala Basics
+# Section 1: Scala Basics
 
 
 
@@ -748,7 +748,7 @@ The raw interpolator of  the strings ignores escaped characters inside raw chara
 
 
 
-# Session 2: Object-Oriented Programming in Scala
+# Section 2: Object-Oriented Programming in Scala
 
 
 
@@ -2929,4 +2929,187 @@ Some examples includes:
 - `scala.Predef`: println, ??? etc.
 
 
+
+# Section 3: Functional Programming in Scala
+
+
+
+## 24. What's a Function?
+
+#### 24.1 Intro
+
+The whole purpose of the functional programming section is to use and work with **functions as first class elements**.
+
+However, the problem is we come from an Object Oriented world. So basically everything is an object that means its an instance of some kind of class. This is how the JVM was originally designed. **So the only way we could simulate functional programming was to use classes in instances of those**
+
+```scala
+trait MyFunction[A, B] {
+  def apply(element: A):B 
+}
+
+val doubler = new Myfunction[Int, Int] {
+  override def apply(element: Int): Int = element * 2
+}
+
+println(doubler(2))
+```
+
+Result:
+
+```
+4
+```
+
+So far, `doubler` is an instance of a function like class which can be called like a function.
+
+Scala supports these function types out of box:
+
+- `function types`are `Function1` or `Function2`...`Function22`
+
+```scala
+val stringToIntConverter = new Function1[Strinbg: Int] {
+  override def apply(string: String): Int = String.toInt
+}
+
+println(stringToIntConverter("3") + 4)
+```
+
+Result:
+
+```scala
+7
+```
+
+**Scala supports these function types up to 22 parameters**
+
+```scala
+val adder: Function2[Int,Int,Int] = new Function2[Int, Int, Int] {
+  override def apply(a: Int, b: Int): Int = a + b
+}
+```
+
+#### 24.2 Syntactic Sugar:
+
+- Function types `Function2[A, B, R]`  can be written as `(A,B) => R`
+
+```scala
+val adder: (Int,Int) => Int = new Function2[Int, Int, Int] {
+  override def apply(a: Int, b: Int): Int = a + b
+}
+```
+
+**All Scala functions are objects or instances of classes deriving from Function1, ..., Function22**
+
+Exercise:
+
+1. a function which takes 2 strings and concatenates them
+
+```scala
+val concatenator: (String,String) => String = new Function2[String, String, String] {
+  override def apply(a: InStringt, b: String): String = a + b
+}
+```
+
+2. transform the MyPredicate and MyTransformer into function types
+
+```scala
+//trait MyPredicate[-T] {
+//  def test(elem: T): Boolean
+//}
+
+//trait MyTransformer[-A, B] {
+//  def transform(elem: A):B
+//}
+```
+
+- `MyPredicate` is basically a funtion type from T => Boolean
+- `MyTransformer` is basically a funtion type from A => B
+
+The `MyPredicate` and `MyTransformer` types do not make sense any more, because we now have `Function` types. So we can safely delete them.
+
+```scala
+abstract class MyList[+A] {
+  def head: A
+  def tail: MyList[A]
+  def add[B >: A](element: B): Mylist[B]
+  def printElements: String
+  override def toString: String = "[" + printElements + "]"
+  def map[B](transformer: (A => B): MyList[B]
+  def flatMap[B](tansformer: (A => MyList[B]): MyList[B]
+  def filter(predicate: A => Boolean): MyList[A]
+}
+
+case object Empty extends MyList[Nothing] {
+  def head: Nothing = throw new NoSuchElementException
+  def tail: MyList[Nothing] = throw new NoSuchElementException
+  def isEmpty: Boolean = true
+  def add[B >: Nothing](element: B): MyList[B] = new Cons(element, Empty)
+  def printElements: String = ""
+  
+  def map[B](transformer: Nothing => B): MyList[B] = Empty
+  def filter(predicate: Nothing => Boolean): MyList[Nothing] = Empty
+  def ++[B :> Nothing](list: MyList[B]): MyList[B] = list
+  def flatMap[B](tansformer: Nothing => MyList[B]): MyList[B] = Empty
+}
+
+case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+  def head: A = h
+  def tail: MyList[A] = t
+  def isEmpty: Boolean = false
+  def add[B >: A](element: B): MyList[B] = new Cons(element, this)
+  def printElements: String = 
+  	if (t.isEmpty) "" + h
+  	else h + " " + t.printElements
+  
+  def filter(predicate: A => Boolean): MyList[A] = 
+  	if (predicate(h)) new Cons(h, t.filter(predicate))
+  	else t.filter(predicate)
+  def map[B](transformer: A => B): MyList[B] = 
+  	new Cons(transformer(h), t.map(transformer))
+  def ++[B :> A](list: MyList[B]): MyList[B] = new Cons(h, t ++ list)
+  def flatMap[B](tansformer: A => MyList[B]): MyList[B] = transformer(h) ++ t.flatMap(transformer) 
+}
+```
+
+**Higer order functions**: either receive functions as parameters or return other functions as result.
+
+3. define a function which takes an argument Int returns another function which takes an Int and returns an Int
+
+   - What's the type of this function
+
+     > Function1[Int, Function1[Int, Int]]
+
+   - how to do it
+
+```scala
+val superAdder: Function1[Int, Function1[Int, Int]] = new Function1[Int, Function1[Int, Int]] {
+  override def apply(x: Int): Function1[Int, Int] = new Function1[Int, Int] {
+    override def apply(y: Int): Int = x + y
+  }
+}
+```
+
+```scala
+val adder3 = superAdder(3)
+
+println(adder3(4))
+println(superAdder(3)(4))  // curried function
+```
+
+Result:
+
+```
+7
+7
+```
+
+- **Curried function have the property that they can be called with multiple parameter lists** 
+
+- A curried function receives some kind of parameter and returns another function which receives parameters.
+
+<img src="https://s1.ax1x.com/2020/10/15/07CPne.png" width="500">
+
+
+
+## 25. Anonymous Functions
 
