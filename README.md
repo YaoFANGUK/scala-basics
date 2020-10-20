@@ -259,7 +259,7 @@ def aBigFunction(n: Int): Int = {
 }
 ```
 
-### 4.2 Excerice
+### 4.2 Exerices
 
 1. A greeting function
 
@@ -3155,7 +3155,7 @@ val justDoSomething: ()=> Int = () => 3
 ```
 
 ```scala
-// carefull
+// careful
 println(justDoSomething)  //function itself
 println(justDoSomething()) // actual call
 ```
@@ -3250,4 +3250,102 @@ val superAdder = (x: Int) => (y: Int) => x + y
 
 
 ## 26. Higer-Order-Functions and Curries
+
+```scala
+object HOFsCurries extends App{
+  val superFunction: (Int, (String, (Int => Boolean)) => Int) => (Int => Int) = ???
+}
+```
+
+### 26.1 Higer-Order-Functions (HOFs)
+
+Function that applies a function n times over a value x:
+
+```scala
+//nTimes(f, n, x)
+//nTimes(f, 3, x) = f(f(f(x))) = nTimes(f, 2, f(x))
+//nTimes(f, n, x) = f(f(...f(x))) = nTimes(f, n-1, f(x))
+def nTimes(f: Int => Int, n:Int ,x: Int): Int = {
+  if (n <= 0) x
+  else nTimes(f, n - 1, f(x))
+}
+```
+
+Testing:
+
+```scala
+val plusOne = (x: Int) => x + 1
+println(nTimes(plusOne, 10, 1))
+```
+
+Result:
+
+```
+11
+```
+
+Better:
+
+```scala
+// nTimesBetter = x => f(f(f...f(x)))
+// increment10 = nTimesBetter(plusOne, 10) = x => plusOne(plues(One)...(x))
+def nTimesBetter(f: Int => Int, n: Int): (Int => Int) = 
+	if (n<=0) (x: Int) => x
+	else (x: Int) => nTimesBetter(f, n-1)(f(x))
+```
+
+Testing:
+
+```scala
+val plus10 = nTimesBetter(plusOne,10)
+println(plus10(1))
+```
+
+Result:
+
+```
+11
+```
+
+### 26.2 Curried Functions
+
+```scala
+val superAdder:Int => (Int => Int) = (x: Int) => (y: Int) => x + y
+```
+
+Testing:
+
+```scala
+val add3 = superAdder(3) // y => 3 + y
+println(add3(10))
+```
+
+Result:
+
+```
+13
+```
+
+- Functions with multiple parameter lists
+
+```scala
+def curriedFormatter(c: String)(x: Double): String = c.format(x)
+```
+
+Testing:
+
+```scala
+val standardFormat: (Double => String) = curriedFormatter("%4.2f")
+val preciseFormat: (Double => String) = curriedFormatter("%10.8f")
+
+println(standardFormat(Math.PI))
+println(preciseFormat(Math.PI))
+```
+
+Result:
+
+```
+3.14
+3.14159265
+```
 
